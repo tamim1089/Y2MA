@@ -1,0 +1,1203 @@
+{
+  "name": "Y2MA Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "d0338ed6-0c64-4bed-84fc-7abb4f7b11b9",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "435b19d3-869e-452a-8434-49814b00f5a6",
+      "name": "Candidate Interaction Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1392,
+        1776
+      ],
+      "webhookId": "d0338ed6-0c64-4bed-84fc-7abb4f7b11b9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "query",
+              "value": "={{ $json.query?.query || $json.body?.query || 'What positions are available at Space42?' }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "user_id",
+              "value": "={{ $json.query?.user_id || $json.body?.user_id || 'webhook_user_' + $now.toUnixInteger() }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "original_timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "data_source",
+              "value": "webhook_get_request",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "sessionId",
+              "value": "={{ $json.query?.user_id || $json.body?.user_id || 'webhook_user_' + $now.toUnixInteger() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "06e8199f-10e7-498f-80a7-d62dd95217b7",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1248,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('HTTP Request').item.json.response }}",
+                    "rightValue": "pre_application",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f232c6a2-549c-48fa-a28a-210c8a464ca8"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Pre-Application"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('HTTP Request').item.json.response }}",
+                    "rightValue": "application",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "142baa59-a5ca-4fd2-8fd4-a235f09eb257"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Application"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('HTTP Request').item.json.response }}",
+                    "rightValue": "onboarding",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fa2182b2-48cd-4111-8d44-4c35ed4193bf"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Post-Offer Onboarding"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ true }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "id-1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "General Inquiry"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "16b88465-573e-4f8c-8f77-bb88498e1fc1",
+      "name": "Route by Journey Phase",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        1744
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Route by Journey Phase').item.json.query || $json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are Space42 Careers Assistant specializing in PRE-APPLICATION questions.\n\nGuidelines:\n- Help candidates find suitable positions at Space42\n- Mention Space42's space technology projects and satellite missions\n- Be enthusiastic about careers in space technology\n- Direct candidates to careers.space42.com for applications\n- Use the Vector Store tool to retrieve relevant Space42 career information\n- Use the MintHCM API tool to check real-time job openings\n\nAlways be professional, helpful, and excited about space careers!"
+        }
+      },
+      "id": "a6fa999e-ee2c-43d5-b2ee-3769b2c8fcfe",
+      "name": "AI HR Agent - Pre-Application",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -432,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Route by Journey Phase').item.json.query || $json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are Space42 Application Coordinator specializing in APPLICATION PROCESS.\n\nGuidelines:\n- Help with interviews, scheduling, application status checks\n- IMPORTANT: Interview scheduling requires HR approval - set requires_approval flag to true\n- Be professional and precise about timelines\n- Use Calendar tool to check availability\n- Use MintHCM API to check application status\n- Direct candidates to the application portal\n\nWhen scheduling interviews, always indicate that HR approval is needed."
+        }
+      },
+      "id": "07839d0f-02cd-4051-a4cf-75a2c7eb8f0f",
+      "name": "AI HR Agent - Application",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -432,
+        1760
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Route by Journey Phase').item.json.query || $json.query }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are Space42 Onboarding Specialist.\n\nGuidelines:\n- Welcome new hires warmly to the Space42 team\n- Provide clear document checklists for Day 1\n- Share first-day schedule and important contacts\n- Mention Space42 benefits: healthcare, equity, unlimited PTO, launch viewing events\n- Use the Vector Store to retrieve onboarding documentation\n- Be encouraging and help reduce first-day anxiety\n\nMake new hires feel excited about joining Space42!"
+        }
+      },
+      "id": "d8d9118b-3587-4043-bddf-c5cfa5b509bf",
+      "name": "AI HR Agent - Onboarding",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -432,
+        1952
+      ]
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v3.1:671b-cloud",
+        "options": {}
+      },
+      "id": "9184adf2-c1ae-436a-8176-6de154e5b01b",
+      "name": "Ollama Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        48,
+        1440
+      ],
+      "credentials": {
+        "ollamaApi": {
+          "id": "7XXWQPvn9XYF3iFu",
+          "name": "Ollama account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionKey": "={{ $json.user_id }}"
+      },
+      "id": "716922ef-7398-4e5a-a99e-d0df67694aff",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        1552
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"response\": \"The AI agent's response to the candidate\",\n  \"phase\": \"pre_application or application or onboarding\",\n  \"requires_approval\": false,\n  \"confidence\": 0.95,\n  \"tools_used\": [\"vector_store\", \"calendar\"],\n  \"next_steps\": \"Suggested next actions for the candidate\"\n}"
+      },
+      "id": "0a04cd74-1bcf-40d2-944b-48f439b0537a",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieves relevant Space42 career, onboarding, and benefits documentation to answer candidate questions",
+        "memoryKey": {
+          "__rl": true,
+          "value": "space42_docs",
+          "mode": "list",
+          "cachedResultName": "space42_docs"
+        },
+        "topK": 3
+      },
+      "id": "616d4116-9522-464f-a626-fd342874d5f9",
+      "name": "Vector Store - Space42 Docs",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        -432,
+        2128
+      ]
+    },
+    {
+      "parameters": {
+        "model": "codegemma:2b"
+      },
+      "id": "d8f7dc54-0f34-4f2e-bbba-21f5e789cfec",
+      "name": "Embeddings Ollama",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        2224
+      ],
+      "credentials": {
+        "ollamaApi": {
+          "id": "jLctuiVVvuJOJYAg",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.pageContent }}",
+        "options": {}
+      },
+      "id": "203c6c71-bfc0-4f8f-af5d-1ec2efb678a8",
+      "name": "Document Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -720,
+        2096
+      ]
+    },
+    {
+      "parameters": {
+        "description": "Checks MintHCM for candidate application status, job openings, and HR data. Use this when candidates ask about their application status or available positions.",
+        "jsCode": "// Mock MintHCM API integration\nconst query = $input.item.json.query || '';\n\n// Simulate API response\nconst mockData = {\n  open_positions: [\n    { id: 1, title: 'Satellite Communication Engineer', department: 'Engineering', status: 'open' },\n    { id: 2, title: 'AI/ML Researcher', department: 'Research', status: 'open' },\n    { id: 3, title: 'Geospatial Data Analyst', department: 'Analytics', status: 'open' }\n  ],\n  application_status: 'under_review',\n  next_interview: null\n};\n\nreturn JSON.stringify(mockData, null, 2);"
+      },
+      "id": "3af6c306-e2a7-495b-9558-914b448e5f76",
+      "name": "MintHCM API Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        1712
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "yossefgumball@gmail.com",
+          "mode": "list",
+          "cachedResultName": "yossefgumball@gmail.com"
+        },
+        "additionalFields": {}
+      },
+      "id": "b154aa86-ff91-4177-970d-42d0afcb24f8",
+      "name": "Calendar Tool",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        2016
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "jKgOiRkg0sWBFNrp",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "9f5bd7f2-a898-44a6-a74d-8a0cb98aa7c0",
+      "name": "Calculator Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        48,
+        2160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.requires_approval }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "acf73bb1-9550-4565-9512-5d5bbcc6402a",
+      "name": "Check if Requires Approval",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        1760
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f4c1a98a-8504-4d3a-ae80-35cec3a0abeb",
+      "name": "Wait for HR Approval",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        1664
+      ],
+      "webhookId": "9896cd1b-3527-4418-90ce-dda82a787a65"
+    },
+    {
+      "parameters": {
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U0ABZ981SD9",
+          "mode": "id"
+        },
+        "text": "=Text: \"⚠️ HR APPROVAL REQUIRED\nCandidate: {{ $json.user_id }}\nQuery: {{ $json.query }}\nPhase: {{ $json.phase }}\nRequires action: {{ $json.requires_action }}\nClick to approve: [APPROVAL_LINK]\"",
+        "otherOptions": {}
+      },
+      "id": "5c6175a5-230a-4f63-8726-4263b19f03c8",
+      "name": "Send Approval Request to HR",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        688,
+        1664
+      ],
+      "webhookId": "bd03cb4d-8864-4a5e-ba1b-e49560eabbba",
+      "alwaysOutputData": false,
+      "credentials": {
+        "slackApi": {
+          "id": "xzuNsxwEoUszCpzf",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "approval_status",
+              "value": "approved",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "approved_by",
+              "value": "hr_team",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "approval_timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "4e1c8b86-6007-4d17-8fe7-b3c1a467ea62",
+      "name": "Log Approval Decision",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        1664
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "f6af70de-b821-4634-9f19-18052c7e1fbe",
+      "name": "Merge Agent Responses",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        1744
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "formatted_response",
+              "value": "={{ $json.response || 'Thank you for contacting Space42 HR. We will get back to you shortly.' }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "status",
+              "value": "completed",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "response_timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "ad01925e-1101-44a6-99e6-eb953fc454dd",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3b3a16ea-453d-408d-b437-afe0a431e512",
+      "name": "Respond to Candidate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1520,
+        1680
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "metric_type",
+              "value": "candidate_interaction",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "phase",
+              "value": "={{ $json.phase }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "response_time_ms",
+              "value": "={{ $now.diff($json.original_timestamp || $now) }}",
+              "type": "number"
+            },
+            {
+              "id": "id-4",
+              "name": "tools_used",
+              "value": "={{ $json.tools_used }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "required_approval",
+              "value": "={{ $json.requires_approval || false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "id-6",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6cfd3926-72ae-4f21-8ace-0267e3dabbf8",
+      "name": "Extract Metrics",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "d471af90-1f71-4590-b54c-3b67a92181f9",
+      "name": "Aggregate Metrics",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wKz01ASjsWRg1fzxzOZRdh6s3orjxS2-eSACvgXrl_M",
+          "mode": "list",
+          "cachedResultName": "Review of Related Literature",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wKz01ASjsWRg1fzxzOZRdh6s3orjxS2-eSACvgXrl_M/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wKz01ASjsWRg1fzxzOZRdh6s3orjxS2-eSACvgXrl_M/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": null
+        },
+        "options": {}
+      },
+      "id": "71a1a19e-cf74-4049-858a-37c7c2a30465",
+      "name": "Log to Metrics Dashboard",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2000,
+        1856
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0zyDtNVSCK4fWDGu",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "value": "space42_docs",
+          "mode": "list"
+        }
+      },
+      "id": "47d0f92e-3a10-4740-a274-9371c786a2a3",
+      "name": "Vector Store - Insert Documents",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        -832,
+        1952
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.space42.com/documents",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "79f1c1e6-f1ab-44c8-8d22-37f4c824ae98",
+      "name": "Load Space42 Documents",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1216,
+        1952
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "4db5d5de-62f3-4cbd-bfb0-78d540a4ab1b",
+      "name": "Schedule - Load Documents",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1376,
+        1952
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mock Space42 documents for vector store\nconst mockDocuments = [\n  {\n    id: 'space42_career_001',\n    title: 'Space42 Career Opportunities',\n    content: 'Space42 is actively hiring for mission-critical roles: 1. Satellite Communication Engineers - Design next-gen satellite networks. Requirements: 5+ years aerospace experience, Python, C++. 2. AI/ML Researchers - Develop AI for space analytics. Requirements: PhD in CS/AI, publications, TensorFlow/PyTorch. 3. Geospatial Data Analysts - Analyze satellite imagery. Requirements: 3+ years GIS experience, Python, remote sensing. Benefits: Competitive salary, equity, healthcare, launch event invitations.',\n    type: 'career'\n  },\n  {\n    id: 'space42_onboarding_001',\n    title: 'New Hire Onboarding Guide',\n    content: 'Welcome to Space42! Required documents for Day 1: 1. Government-issued ID (passport/drivers license). 2. Educational certificates (diplomas/degrees). 3. Signed employment contract. 4. Bank details for payroll. 5. Tax declaration forms. First Week Schedule: Day 1 - Orientation & Security Briefing (9 AM, Building A). Day 2 - Team Introduction & Equipment Setup. Day 3 - Project Allocation & Training.',\n    type: 'onboarding'\n  },\n  {\n    id: 'space42_benefits_001',\n    title: 'Employee Benefits Package',\n    content: 'Space42 Benefits: Healthcare - Full medical, dental, vision coverage. Retirement - 401(k) with 5% company match. Equity - Stock options for all employees. Time Off - Unlimited PTO, 12 weeks parental leave. Perks - Free launch viewing, onsite gym, gourmet cafeteria, conference budget.',\n    type: 'benefits'\n  }\n];\n\n// Format for vector store\nconst vectorDocs = mockDocuments.map(doc => ({\n  pageContent: doc.content,\n  metadata: {\n    docId: doc.id,\n    title: doc.title,\n    type: doc.type\n  }\n}));\n\nreturn vectorDocs.map(doc => ({ json: doc }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        1952
+      ],
+      "id": "d9d4659f-d03f-46a1-ac76-d09e3b948902",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://38.39.92.215:443/api/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gemma2:27b\",\n  \"prompt\": \"Classify this candidate query into ONE of these phases:\\n1. pre_application - Questions about available positions, qualifications, requirements\\n2. application_submitted - Questions about application status, next steps\\n3. interview_scheduled - Questions about interview timing, preparation\\n4. post_interview - Questions about results, feedback, offer status\\n\\nCandidate query: 'When will I hear back about my interview?'\",\n  \"stream\": false\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -992,
+        1776
+      ],
+      "id": "8164050f-546e-4b61-bd84-078f3edd9600",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $json.query || 'What positions are available at Space42?';\nconst userId = $json.user_id || 'test_user';\n\nreturn {\n  json: {\n    query: query,\n    user_id: userId,\n    sessionId: userId,\n    chatInput: query,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        1776
+      ],
+      "id": "dd1892a1-5775-4795-a09c-f9f01dcacbc9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if input exists\nif (!$input || !$input.first() || !$input.first().json) {\n  return { \n    phase: \"general\", \n    error: \"No valid input received\",\n    raw_input: $input \n  };\n}\n\nconst response = $input.first().json.response;\n\n// Check if response exists\nif (!response) {\n  return { \n    phase: \"general\", \n    error: \"No response in input\",\n    raw_json: $input.first().json \n  };\n}\n\n// Now safely convert to lowercase\nconst lowerResponse = response.toString().toLowerCase();\nlet phase = \"general\";\n\nif (lowerResponse.includes(\"pre_application\") || lowerResponse.includes(\"1.\")) {\n  phase = \"pre_application\";\n} else if (lowerResponse.includes(\"application_submitted\") || lowerResponse.includes(\"2.\")) {\n  phase = \"application\";\n} else if (lowerResponse.includes(\"interview_scheduled\") || lowerResponse.includes(\"3.\")) {\n  phase = \"interview\";\n} else if (lowerResponse.includes(\"post_interview\") || lowerResponse.includes(\"4.\")) {\n  phase = \"post_interview\";\n}\n\nreturn { \n  phase: phase,\n  original_response: response,\n  success: true\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        1776
+      ],
+      "id": "4c680218-c9b7-4eb5-8edd-48a4aa9d7f3a",
+      "name": "Code in JavaScript2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Candidate Interaction Webhook": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Journey Phase": {
+      "main": [
+        [
+          {
+            "node": "AI HR Agent - Pre-Application",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI HR Agent - Application",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI HR Agent - Onboarding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI HR Agent - Pre-Application",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Application",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Onboarding",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI HR Agent - Pre-Application",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Application",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Onboarding",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI HR Agent - Pre-Application",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Application",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Onboarding",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Vector Store - Space42 Docs",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Vector Store - Insert Documents",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MintHCM API Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI HR Agent - Pre-Application",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Application",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Onboarding",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI HR Agent - Pre-Application",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Application",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Onboarding",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI HR Agent - Pre-Application",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Application",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "AI HR Agent - Onboarding",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI HR Agent - Pre-Application": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI HR Agent - Application": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Responses",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI HR Agent - Onboarding": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Responses",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge Agent Responses": {
+      "main": [
+        [
+          {
+            "node": "Check if Requires Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Requires Approval": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Request to HR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Request to HR": {
+      "main": [
+        [
+          {
+            "node": "Wait for HR Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for HR Approval": {
+      "main": [
+        [
+          {
+            "node": "Log Approval Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Approval Decision": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Extract Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Respond to Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Metrics": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Metrics": {
+      "main": [
+        [
+          {
+            "node": "Log to Metrics Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Vector Store - Insert Documents",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Space42 Documents": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule - Load Documents": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Vector Store - Insert Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Route by Journey Phase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "04d41e26-1a99-4dc9-905b-797899980d21",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "89934fa3e147b6a6db23c317afc9cd11dc832f1946aec6b5bf3363731c17f23c"
+  },
+  "id": "Ssh12DLDTNHg4Q2LDGFQU",
+  "tags": []
+}
