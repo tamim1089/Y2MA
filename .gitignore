@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+*.egg-info/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+logs/*.log
+
+# Data (processed, keep raw)
+data/processed/*
+data/embeddings/*
+!data/processed/.gitkeep
+!data/embeddings/.gitkeep
+
+# Streamlit
+.streamlit/secrets.toml
+
+# FAISS indexes (large files)
+*.faiss
+*.pkl
+
+# OS
+.DS_Store
+Thumbs.db

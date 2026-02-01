@@ -1,0 +1,24 @@
+# Y2MA - Space42 AI Career Assistant
+# All free, locally-running dependencies
+
+# Core Framework
+streamlit==1.31.0
+
+# Embeddings & Vector Search
+sentence-transformers==2.3.1
+faiss-cpu>=1.8.0
+
+# Document Processing
+pypdf==3.17.4
+python-docx==1.1.0
+
+# Data Processing
+pandas==2.2.0
+numpy==1.26.3
+
+# HTTP & Environment
+requests==2.31.0
+python-dotenv==1.0.1
+
+# Token Counting
+tiktoken==0.5.2
