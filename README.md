@@ -878,13 +878,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **Ollama** - Jeffrey Morgan for making local LLMs accessible
 - **Streamlit** - For the amazing UI framework
 
----
-
-## Contact & Support
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/Y2MA/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/Y2MA/discussions)
-- **Email**: your.email@example.com
 
 ---
 
